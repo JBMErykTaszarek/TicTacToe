@@ -1,4 +1,5 @@
 using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
@@ -6,45 +7,105 @@ using UnityEngine.UI;
 
 public class NewBehaviourScript : MonoBehaviour
 {
-    public Button button;
+    public Button button, regButton;
     public Sprite Mark_X;
     public Sprite Mark_0;
+    public Sprite Background;
     public Sprite NONE;
     public Text WinText;
-    public Button RegameButton;
-    bt = GameObject.Find("RegameButton").GetComponent<Button>();
+    public bool isBot = false;
     public string[] board = {"n","n","n",
                              "n","n","n",
                              "n","n","n"};
     public string turn = "X";
+    
+    
 
     public void UpdateGame(int number)
     {
-        if (turn == "X")
-        {
-            board[number] = "X";
-            turn = "O";
-        }
-        else
-        {
-            board[number] = "O";
-            turn = "X";
-        }
-
-        if (CheckWin() == "Win")
-        {
+     
+        
             if (turn == "X")
             {
-                WinText.text = "O Won";
+                //board[number] = "X";
+                //turn = "O";
+                if (!isBot)
+                {
+                board[number] = "X";
+                turn = "O";
+                }
+                else
+                {
+                board[number] = "X";
+                if (CheckWin() == "InGame")
+                {
+                    int index = Array.IndexOf(board, "n");
+                    board[index] = "O";
+                    button = GameObject.Find("Button" + index).GetComponent<Button>();
+                    button.image.overrideSprite = Mark_0;
+                }
+                
+                
+                //turn = "X";
+                }
             }
             else
             {
-                WinText.text = "X Won";
+                if (!isBot)
+                {
+                board[number] = "O";
+                turn = "X";
+                }
+                else
+                {
+                board[number] = "0";
+                if (CheckWin() == "InGame")
+                {
+                    int index = Array.IndexOf(board, "n");
+                    board[index] = "X";
+                    button = GameObject.Find("Button" + index).GetComponent<Button>();
+                    button.image.overrideSprite = Mark_X;
+                }
+                
+                
+                //turn = "O";
+                }
+                
             }
+
+        WinText.text = turn + " on move";
+
+
+        if (CheckWin() == "Win")
+        {
+            regButton = GameObject.Find("RegameButton").GetComponent<Button>();
+            regButton.image.color = Color.white;
+            Text regText = GameObject.Find("regText").GetComponent<Text>();
+            regText.text = "Play Again";
+            if (isBot)
+            {
+                WinText.text = turn + " Won";
+            }
+            else
+            {
+                if (turn == "X")
+                {
+                    WinText.text = "O Won";
+                }
+                else
+                {
+                    WinText.text = "X Won";
+                }
+            }
+            
             //turn == "X" ? WinText.text = "O Won" : WinText.text = "X Won";
         }
         if (CheckWin() == "Draw")
         {
+            regButton = GameObject.Find("RegameButton").GetComponent<Button>();
+            regButton.image.color = Color.white;
+            Text regText = GameObject.Find("regText").GetComponent<Text>();
+            regText.text = "Play Again";
 
             WinText.text = "Draw";
         }
@@ -100,6 +161,29 @@ public class NewBehaviourScript : MonoBehaviour
             board[i] = "n";
             button = GameObject.Find("Button" + i).GetComponent<Button>();
             button.image.overrideSprite = NONE;
+        }
+        regButton = GameObject.Find("RegameButton").GetComponent<Button>();
+        regButton.image.color = new Color32(13, 26, 87, 255);
+        Text regText = GameObject.Find("regText").GetComponent<Text>();
+        regText.text = "";
+        WinText.text = turn + " on move";
+    }
+
+    public void ChangeBot()
+    {
+        Text BotText = GameObject.Find("BotText").GetComponent<Text>();
+        Button BotButton = GameObject.Find("BotButton").GetComponent<Button>();
+        if (isBot)
+        {
+            isBot = false;
+            BotText.text = "Bot off";
+            BotButton.image.color = new Color32(87, 87, 87, 255);
+        }
+        else
+        {
+            isBot = true;
+            BotText.text = "Bot on";
+            BotButton.image.color = Color.white;
         }
     }
     
